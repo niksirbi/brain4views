@@ -301,7 +301,7 @@ def plot_surf4(meshes, overlays=None,
     fig.savefig(output_file, dpi=128)
 
 
-def plot_surf_parcellation(
+def plot_surf4_parcellation(
               meshes, parcellations,
               sulc_maps=None, ctx_masks=None,
               cmap=None, shuffle_cmap=True,
@@ -324,7 +324,7 @@ def plot_surf_parcellation(
         are .gii, or Freesurfer specific file .sulc
     ctx_masks: optional, list of two files [lh, rh]
         Cortical labels (masks) to restrict overlay data.
-        Calid formats are Freesurfer specific file .label,
+        Valid formats are Freesurfer specific file .label,
         or .gii
     cmap: matplotlib colormap, str or colormap object, default is None
         To use for plotting of the stat_map. Either a string
@@ -348,11 +348,11 @@ def plot_surf_parcellation(
     else:
         new_cmap = cmap
 
-    plot_surf(meshes,
-              overlays=parcellations,
-              sulc_maps=sulc_maps,
-              ctx_masks=ctx_masks,
-              vmin=None, threshold=0.5, vmax=None,
-              cmap=new_cmap, avg_method='median',
-              title=title, colorbar=False,
-              output_file=output_file)
+    plot_surf4(meshes,
+               overlays=parcellations,
+               sulc_maps=sulc_maps,
+               ctx_masks=ctx_masks,
+               vmin=None, threshold=0.5, vmax=None,
+               cmap=new_cmap, avg_method='median',
+               title=title, colorbar=False,
+               output_file=output_file)
