@@ -156,9 +156,9 @@ def plot_surf4(meshes, overlays=None,
         if ctx_masks is None:
             mask = np.zeros(vertices.shape[0]).astype(bool)
         else:
-            mask = np.ones(vertices.shape[0]).astype(bool)
+            mask = np.zeros(vertices.shape[0]).astype(bool)
             cortex = surface.load_surf_data(ctx_masks[m])
-            mask[cortex] = 0
+            mask[cortex] = 1
 
         ##################################
         # read sulcal map if provided
@@ -190,15 +190,19 @@ def plot_surf4(meshes, overlays=None,
             raise ValueError('The overlay does not have the same number '
                              'of vertices as the mesh.')
 
-        # optional masking of medial wall (show only cortical data)
-        if ctx_masks is not None:
-            overlay[mask] = 0
-
+        ##################################
         # create face values from vertex values by selected avg methods
         if avg_method == 'mean':
             overlay_faces = np.mean(overlay[faces], axis=1)
         elif avg_method == 'median':
             overlay_faces = np.median(overlay[faces], axis=1)
+
+        # Keep only indices within cortical mask
+        if ctx_masks is None:
+            kept_indices = np.arange(overlay_faces.shape[0])
+        else:
+            mask_faces = np.median(mask[faces], axis=1)
+            kept_indices = np.where(mask[faces] >= 0.5)[0]
 
         # if no vmin/vmax are passed figure them out from the data
         if vmin is None:
@@ -207,10 +211,9 @@ def plot_surf4(meshes, overlays=None,
             vmax = np.nanmax(overlay_faces)
 
         # threshold if indicated
-        if threshold is None:
-            kept_indices = np.arange(overlay_faces.shape[0])
-        else:
-            kept_indices = np.where(np.abs(overlay_faces) >= threshold)[0]
+        if threshold is not None:
+            valid_indices = np.where(np.abs(overlay_faces) >= threshold)[0]
+            kept_indices = [i for i in kept_indices if i in valid_indices]
 
         # assign colormap to overlay
         overlay_faces = overlay_faces - vmin
