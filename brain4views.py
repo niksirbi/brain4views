@@ -62,12 +62,12 @@ def yrotate(theta):
                      [-s, 0, c, 0], [0, 0, 0, 1]], dtype=float)
 
 
-def plot_surf(meshes, overlays=None,
-              sulc_maps=None, ctx_masks=None,
-              cmap=None, threshold=None,
-              vmin=None, vmax=None,
-              avg_method='mean', colorbar=False,
-              output_file='plot.png', title=''):
+def plot_surf4(meshes, overlays=None,
+               sulc_maps=None, ctx_masks=None,
+               cmap=None, threshold=None,
+               vmin=None, vmax=None,
+               avg_method='mean', colorbar=False,
+               output_file='plot.png', title=''):
     """Plottig of surface mesh with optional overlay data
     and sulcal maps.
 
@@ -87,7 +87,7 @@ def plot_surf(meshes, overlays=None,
         are .gii, or Freesurfer specific file .sulc
     ctx_masks: optional, list of two files [lh, rh]
         Cortical labels (masks) to restrict overlay data.
-        Calid formats are Freesurfer specific file .label,
+        Valid formats are Freesurfer specific file .label,
         or .gii
     cmap: matplotlib colormap, str or colormap object, default is None
         To use for plotting of the stat_map. Either a string
