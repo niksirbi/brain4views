@@ -352,7 +352,7 @@ def plot_surf4_parcellation(
                overlays=parcellations,
                sulc_maps=sulc_maps,
                ctx_masks=ctx_masks,
-               vmin=None, threshold=0.5, vmax=None,
+               vmin=None, threshold=None, vmax=None,
                cmap=new_cmap, avg_method='median',
                title=title, colorbar=False,
                output_file=output_file)
