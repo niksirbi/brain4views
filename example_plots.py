@@ -15,8 +15,8 @@ surf_dir = '{0}/{1}/surf/'.format(SUBJECTS_DIR, SUBJ)
 label_dir = '{0}/{1}/label/'.format(SUBJECTS_DIR, SUBJ)
 
 # surface meshes (.inflated, .pial, .white etc.)
-lh_surf = surf_dir + 'lh.pial_semi_inflated'
-rh_surf = surf_dir + 'rh.pial_semi_inflated'
+lh_surf = surf_dir + 'lh.inflated'
+rh_surf = surf_dir + 'rh.inflated'
 # sulcal depth maps (.sulc)
 lh_sulc = surf_dir + 'lh.sulc'
 rh_sulc = surf_dir + 'rh.sulc'
@@ -30,7 +30,13 @@ rh_mask = label_dir + 'rh.cortex.label'
 lh_parc = label_dir + 'lh.aparc.a2009s.annot'
 rh_parc = label_dir + 'rh.aparc.a2009s.annot'
 
-'''
+# Plot sulcal map only
+plot_surf4([lh_surf, rh_surf],
+           overlays=None,
+           sulc_maps=[lh_sulc, rh_sulc],
+           ctx_masks=[lh_mask, rh_mask],
+           output_file='human_sulcal_plot.png')
+
 # plot cortical thickness
 plot_surf4([lh_surf, rh_surf],
            overlays=[lh_thick, rh_thick],
@@ -39,24 +45,20 @@ plot_surf4([lh_surf, rh_surf],
            vmin=1, threshold=None, vmax=4,
            cmap='inferno', avg_method='mean',
            title='Cortical thickness (mm)', colorbar=True,
-           output_file='cortical_thickness.png')
+           output_file='human_cortical_thickness.png')
 
 # Plot correlation map
 lh_over = '/home/nsirmpilatze/BS/Meshes/human_maps/BS_Zmap_mean_lh.surf.gii'
 rh_over = '/home/nsirmpilatze/BS/Meshes/human_maps/BS_Zmap_mean_rh.surf.gii'
 
-plot_surf([lh_surf, rh_surf],
-          overlays=[lh_over, rh_over],
-          sulc_maps=None,
-          ctx_masks=[lh_mask, rh_mask],
-          vmin=-1.5, threshold=None, vmax=1.5,
-          cmap='RdBu_r', avg_method='mean',
-          title='Correlation (Z)', colorbar=True,
-          output_file='human_correlation_plot.png')
-
-elapsed = time.time() - start
-print('surfaces rendered in {0:.2f} s'.format(elapsed))
-'''
+plot_surf4([lh_surf, rh_surf],
+           overlays=[lh_over, rh_over],
+           sulc_maps=[lh_sulc, rh_sulc],
+           ctx_masks=[lh_mask, rh_mask],
+           vmin=-1.5, threshold=0.5, vmax=1.5,
+           cmap='RdBu_r', avg_method='mean',
+           title='Correlation (Z)', colorbar=True,
+           output_file='human_correlation_plot.png')
 
 # Plot parcellation
 lh_parc = label_dir + 'lh.aparc.a2009s.annot'
