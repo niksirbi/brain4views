@@ -171,9 +171,12 @@ def plot_surf4(meshes, overlays=None,
                                  'number of vertices as the mesh.')
 
         sulc_faces = np.mean(sulc[faces], axis=1)
+        # binarize sulcal map
         if sulc_faces.min() != sulc_faces.max():
-            sulc_faces = sulc_faces - sulc_faces.min()
-            sulc_faces = sulc_faces / sulc_faces.max()
+            neg_sulc = np.where(sulc_faces <= 0)
+            pos_sulc = np.where(sulc_faces > 0)
+            sulc_faces[neg_sulc] = 0
+            sulc_faces[pos_sulc] = 1
 
         ##################################
         # read overlay map if provided
@@ -189,7 +192,7 @@ def plot_surf4(meshes, overlays=None,
         ##################################
         # assign greyscale colormap to sulcal map faces
         greys = plt.get_cmap('Greys', 512)
-        greys_narrow = ListedColormap(greys(np.linspace(0.25, 0.75, 256)))
+        greys_narrow = ListedColormap(greys(np.linspace(0.4, 0.6, 256)))
         face_colors = greys_narrow(sulc_faces)
 
         # Get indices of faces within the cortex
