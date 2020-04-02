@@ -217,7 +217,7 @@ def plot_surf4(meshes, overlays=None,
         ##################################
         # assign greyscale colormap to sulcal map faces
         greys = plt.get_cmap('Greys', 512)
-        greys_narrow = ListedColormap(greys(np.linspace(0.4, 0.6, 256)))
+        greys_narrow = ListedColormap(greys(np.linspace(0.42, 0.58, 256)))
         face_colors = greys_narrow(sulc_faces)
 
         # Get indices of faces within the cortex
@@ -226,6 +226,7 @@ def plot_surf4(meshes, overlays=None,
         else:
             mask_faces = np.median(mask[faces], axis=1)
             kept_indices = np.where(mask_faces >= 0.5)[0]
+            masked_indices = np.where(mask_faces < 0.5)[0]
 
         if overlays is not None:
             # create face values from vertex values by selected avg methods
@@ -250,6 +251,11 @@ def plot_surf4(meshes, overlays=None,
             overlay_faces = overlay_faces / (vmax - vmin)
             face_colors[kept_indices] = cmap(overlay_faces[kept_indices])
 
+        # make non-cortical faces dark grey
+        if ctx_masks is not None:
+            face_colors[masked_indices] = [0.2, 0.2, 0.2, 1]
+
+        # assign label faces to appropriate color
         for i, L in enumerate(label_mask_faces):
             L_idx = np.where(L >= 0.5)
             face_colors[L_idx] = label_colors[i]

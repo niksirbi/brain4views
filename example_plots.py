@@ -49,6 +49,7 @@ plot_surf4([lh_surf, rh_surf],
 plot_surf4([lh_surf, rh_surf],
            overlays=None,
            sulc_maps=[lh_sulc, rh_sulc],
+           ctx_masks=[lh_mask, rh_mask],
            labels=[[lh_V1, rh_V1], [lh_MT, rh_MT]],
            label_colors=['green', 'cyan'],
            output_file='human_sulcal_plot_withV1-MT.png')
@@ -63,27 +64,27 @@ plot_surf4([lh_surf, rh_surf],
            title='Cortical thickness (mm)', colorbar=True,
            output_file='human_cortical_thickness.png')
 
-# Plot correlation map
+# Plot unthresholded correlation map
 plot_surf4([lh_surf, rh_surf],
            overlays=[lh_over, rh_over],
-           sulc_maps=None,
+           sulc_maps=[lh_sulc, rh_sulc],
            ctx_masks=[lh_mask, rh_mask],
-           vmin=-1.5, threshold=0.5, vmax=1.5,
+           vmin=-1.5, threshold=None, vmax=1.5,
            cmap='RdBu_r', avg_method='mean',
            title='Correlation (Z)', colorbar=True,
            output_file='human_correlation_plot.png')
 
-# Plot correlation map with V1 labels
+# Plot correlation map with V1 and MT labels
 plot_surf4([lh_surf, rh_surf],
            overlays=[lh_over, rh_over],
-           sulc_maps=None,
+           sulc_maps=[lh_sulc, rh_sulc],
            ctx_masks=[lh_mask, rh_mask],
-           labels=[[lh_V1, rh_V1]],
-           label_colors=['green'],
-           vmin=-1.5, threshold=0.5, vmax=1.5,
+           labels=[[lh_V1, rh_V1], [lh_MT, rh_MT]],
+           label_colors=['green', 'cyan'],
+           vmin=-1.5, threshold=0.4, vmax=1.5,
            cmap='RdBu_r', avg_method='mean',
            title='Correlation (Z)', colorbar=True,
-           output_file='human_correlation_plot_withV1.png')
+           output_file='human_correlation_plot_withV1-MT.png')
 
 # Plot parcellation
 lh_parc = label_dir + 'lh.aparc.a2009s.annot'
