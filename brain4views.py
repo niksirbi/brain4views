@@ -188,7 +188,9 @@ def plot_surf4(meshes, overlays=None,
 
         ##################################
         # assign greyscale colormap to sulcal map faces
-        face_colors = plt.get_cmap('Greys')(sulc_faces)
+        greys = plt.get_cmap('Greys', 512)
+        greys_narrow = ListedColormap(greys(np.linspace(0.25, 0.75, 256)))
+        face_colors = greys_narrow(sulc_faces)
 
         # Get indices of faces within the cortex
         if ctx_masks is None:

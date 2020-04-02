@@ -36,7 +36,7 @@ plot_surf4([lh_surf, rh_surf],
            sulc_maps=[lh_sulc, rh_sulc],
            ctx_masks=[lh_mask, rh_mask],
            output_file='human_sulcal_plot.png')
-
+'''
 # plot cortical thickness
 plot_surf4([lh_surf, rh_surf],
            overlays=[lh_thick, rh_thick],
@@ -75,3 +75,4 @@ plot_surf4_parcellation(
 
 elapsed = time.time() - start
 print('surfaces rendered in {0:.2f} s'.format(elapsed))
+'''
