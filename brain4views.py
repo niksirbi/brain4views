@@ -64,6 +64,7 @@ def yrotate(theta):
 
 def plot_surf4(meshes, overlays=None,
                sulc_maps=None, ctx_masks=None,
+               labels=None, label_colors=None,
                cmap=None, threshold=None,
                vmin=None, vmax=None,
                avg_method='mean', colorbar=False,
@@ -89,8 +90,16 @@ def plot_surf4(meshes, overlays=None,
         Cortical labels (masks) to restrict overlay data.
         Valid formats are Freesurfer specific file .label,
         or .gii
+    labels: list of lists of the form
+        [ [lh_label1, rh_label1], [lh_label2, rh_label2], ... ]
+        Labels to be displayed on the surface mesh. Valid formats
+        Freesurfer specific files (.label) or equivalent files
+        in .gii format
+    label_colors: list of matplotlib colors to be assigned to labels,
+        of the form [ color_label1, color_label2, ... ]
+        Must have the same langth as the list of labels.
     cmap: matplotlib colormap, str or colormap object, default is None
-        To use for plotting of the stat_map. Either a string
+        To use for plotting of the overlay. Either a string
         which is a name of a matplotlib colormap, or a matplotlib
         colormap object. If None, matplotlib default will be chosen.
     avg_method: {'mean', 'median'}, default is 'mean'
@@ -158,7 +167,7 @@ def plot_surf4(meshes, overlays=None,
         else:
             mask = np.zeros(vertices.shape[0]).astype(bool)
             cortex = surface.load_surf_data(ctx_masks[m])
-            mask[cortex] = 1  # cortical vertice = 1
+            mask[cortex] = 1  # cortical vertices = 1
 
         ##################################
         # read sulcal map if provided
@@ -179,15 +188,31 @@ def plot_surf4(meshes, overlays=None,
             sulc_faces[pos_sulc] = 1
 
         ##################################
+        # read labels if provided
+        label_masks = []
+        if labels is not None:
+            if len(label_colors) != len(labels):
+                raise ValueError('labels and label_colors must be'
+                                 ' lists of the same length.')
+            label_colors = [to_rgba_array(c) for c in label_colors]
+            for label in labels:
+                L_mask = np.zeros(vertices.shape[0]).astype(bool)
+                L_indices = surface.load_surf_data(label[m])
+                L_mask[L_indices] = 1  # label vertices = 1
+                label_masks.append(L_mask)
+
+        label_mask_faces = [np.median(L[faces], axis=1) for L in label_masks]
+
+        ##################################
         # read overlay map if provided
         if overlays is not None:
             overlay = surface.load_surf_data(overlays[m])
             if len(overlay.shape) is not 1:
-                raise ValueError('overlay can only have one dimension '
+                raise ValueError('overlay can only have one dimension'
                                  ' but has %i dimensions' % len(overlay.shape))
             if overlay.shape[0] != vertices.shape[0]:
-                raise ValueError('The overlay does not have the same number '
-                                 'of vertices as the mesh.')
+                raise ValueError('The overlay does not have the same number'
+                                 ' of vertices as the mesh.')
 
         ##################################
         # assign greyscale colormap to sulcal map faces
@@ -224,6 +249,10 @@ def plot_surf4(meshes, overlays=None,
             overlay_faces = overlay_faces - vmin
             overlay_faces = overlay_faces / (vmax - vmin)
             face_colors[kept_indices] = cmap(overlay_faces[kept_indices])
+
+        for i, L in enumerate(label_mask_faces):
+            L_idx = np.where(L >= 0.5)
+            face_colors[L_idx] = label_colors[i]
 
         face_colors[:, 0] *= intensity
         face_colors[:, 1] *= intensity
@@ -333,7 +362,7 @@ def plot_surf4_parcellation(
         Valid formats are Freesurfer specific file .label,
         or .gii
     cmap: matplotlib colormap, str or colormap object, default is None
-        To use for plotting of the stat_map. Either a string
+        To use for plotting of the overlay. Either a string
         which is a name of a matplotlib colormap, or a matplotlib
         colormap object. If None, matplotlib default will be chosen.
     shuffle_cmap: boolean
