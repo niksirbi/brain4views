@@ -65,8 +65,8 @@ def yrotate(theta):
 def plot_surf4(meshes, overlays=None,
                sulc_maps=None, ctx_masks=None,
                labels=None, label_colors=None,
-               cmap=None, threshold=None,
-               vmin=None, vmax=None,
+               cmap=None, shuffle_cmap=False,
+               threshold=None, vmin=None, vmax=None,
                avg_method='mean', colorbar=False,
                output_file='plot.png', title=''):
     """Plottig of surface mesh with optional overlay data
@@ -102,6 +102,8 @@ def plot_surf4(meshes, overlays=None,
         To use for plotting of the overlay. Either a string
         which is a name of a matplotlib colormap, or a matplotlib
         colormap object. If None, matplotlib default will be chosen.
+    shuffle_cmap: boolean
+        If True, randomly shuffle the cmap (useful for parcellations)
     avg_method: {'mean', 'median'}, default is 'mean'
         How to average vertex values to derive the face value, mean results
         in smooth, median in sharp boundaries (e.g. for parcellations).
@@ -130,6 +132,12 @@ def plot_surf4(meshes, overlays=None,
         # if cmap is given as string, translate to matplotlib cmap
         if isinstance(cmap, str):
             cmap = plt.cm.get_cmap(cmap)
+
+    # randomly shuffle colormap if prompted
+    if shuffle_cmap:
+        vals = np.linspace(0, 1, 256)
+        np.random.shuffle(vals)
+        cmap = ListedColormap(plt.cm.get_cmap(cmap)(vals))
 
     # initiate figure
     fig = plt.figure(figsize=(8, 6))
@@ -340,60 +348,3 @@ def plot_surf4(meshes, overlays=None,
 
     # save file
     fig.savefig(output_file, dpi=128)
-
-
-def plot_surf4_parcellation(
-              meshes, parcellations,
-              sulc_maps=None, ctx_masks=None,
-              cmap=None, shuffle_cmap=True,
-              output_file='plot.png', title=''):
-    """Plottig of surface mesh with parcellation overlaid
-
-    Parameters
-    ----------
-    meshes: list of two files [left hemi (lh), right hemi (rh)]
-        Surface mesh geometry, Valid file formats are
-        .gii or Freesurfer specific files such as .orig, .pial,
-        .sphere, .white, .inflated
-    parcellation: optional, list of two files [lh, rh]
-        Data to be displayed on the surface mesh. Valid formats
-        Freesurfer specific files (.annot) or equivalent files
-        in .gii format
-    sulc_maps: optional, list of two files [lh, rh]
-        Sulcal depth map to be plotted on the mesh in greyscale,
-        underneath the overlay.  Valid formats
-        are .gii, or Freesurfer specific file .sulc
-    ctx_masks: optional, list of two files [lh, rh]
-        Cortical labels (masks) to restrict overlay data.
-        Valid formats are Freesurfer specific file .label,
-        or .gii
-    cmap: matplotlib colormap, str or colormap object, default is None
-        To use for plotting of the overlay. Either a string
-        which is a name of a matplotlib colormap, or a matplotlib
-        colormap object. If None, matplotlib default will be chosen.
-    shuffle_cmap: boolean
-        If True, randomly shuffle the cmap
-    title : str, optional
-        Figure title.
-    output_file: str, or None, optional
-        The name of an image file to export plot to. Valid extensions
-        are .png, .pdf, .svg. If output_file is not None, the plot
-        is saved to a file, and the display is closed.
-    """
-
-    # randomly shuffle colormap if prompted
-    if shuffle_cmap:
-        vals = np.linspace(0, 1, 256)
-        np.random.shuffle(vals)
-        new_cmap = ListedColormap(plt.cm.get_cmap(cmap)(vals))
-    else:
-        new_cmap = cmap
-
-    plot_surf4(meshes,
-               overlays=parcellations,
-               sulc_maps=sulc_maps,
-               ctx_masks=ctx_masks,
-               vmin=None, threshold=None, vmax=None,
-               cmap=new_cmap, avg_method='median',
-               title=title, colorbar=False,
-               output_file=output_file)

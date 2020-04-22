@@ -1,7 +1,7 @@
 import time
 import numpy as np
 from matplotlib import pyplot as plt
-from brain4views import plot_surf4, plot_surf4_parcellation
+from brain4views import plot_surf4
 
 start = time.time()
 
@@ -15,8 +15,8 @@ surf_dir = '{0}/{1}/surf/'.format(SUBJECTS_DIR, SUBJ)
 label_dir = '{0}/{1}/label/'.format(SUBJECTS_DIR, SUBJ)
 
 # surface meshes (.inflated, .pial, .white etc.)
-lh_surf = surf_dir + 'lh.inflated'
-rh_surf = surf_dir + 'rh.inflated'
+lh_surf = surf_dir + 'lh.pial_semi_inflated'
+rh_surf = surf_dir + 'rh.pial_semi_inflated'
 # sulcal depth maps (.sulc)
 lh_sulc = surf_dir + 'lh.sulc'
 rh_sulc = surf_dir + 'rh.sulc'
@@ -90,14 +90,14 @@ plot_surf4([lh_surf, rh_surf],
 lh_parc = label_dir + 'lh.aparc.a2009s.annot'
 rh_parc = label_dir + 'rh.aparc.a2009s.annot'
 
-plot_surf4_parcellation(
-          [lh_surf, rh_surf],
-          [lh_parc, rh_parc],
-          sulc_maps=None,
-          ctx_masks=[lh_mask, rh_mask],
-          cmap='gist_rainbow', shuffle_cmap=True,
-          title='Destrieux Atlas',
-          output_file='human_destrieux_atlas.png')
+plot_surf4([lh_surf, rh_surf],
+           overlays=[lh_parc, rh_parc],
+           sulc_maps=None,
+           ctx_masks=[lh_mask, rh_mask],
+           cmap='gist_rainbow', shuffle_cmap=True,
+           title='Destrieux Atlas',
+           avg_method='median',
+           output_file='human_destrieux_atlas.png')
 
 elapsed = time.time() - start
 print('surfaces rendered in {0:.2f} s'.format(elapsed))
