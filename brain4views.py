@@ -259,9 +259,9 @@ def plot_surf4(meshes, overlays=None,
             overlay_faces = overlay_faces / (vmax - vmin)
             face_colors[kept_indices] = cmap(overlay_faces[kept_indices])
 
-        # make non-cortical faces middle grey
+        # make non-cortical faces light grey
         if ctx_masks is not None:
-            face_colors[masked_indices] = [0.5, 0.5, 0.5, 1]
+            face_colors[masked_indices] = [0.8, 0.8, 0.8, 1]
 
         # assign label faces to appropriate color
         for i, L in enumerate(label_mask_faces):
