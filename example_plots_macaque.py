@@ -6,17 +6,11 @@ from brain4views import plot_surf4
 
 start = time.time()
 
-path = '/home/nsirmpilatze/BS/Meshes/katja_surf/'
-
-lh_mesh = path + 'lh.pial.surf.gii'
-rh_mesh = path + 'rh.pial.surf.gii'
-stat = path + 'BS_Zmap_mean_NMT.nii.gz'
-lh_over = vol_to_surf(stat, lh_mesh, radius=1, kind='ball')
-rh_over = vol_to_surf(stat, rh_mesh, radius=1, kind='ball')
-lh_surf = path + 'lh.pial_semi_inflated.surf.gii'
-rh_surf = path + 'rh.pial_semi_inflated.surf.gii'
-lh_sulc = path + 'lh.pial.mean_curv.shape.gii'
-rh_sulc = path + 'rh.pial.mean_curv.shape.gii'
+lh_surf = './macaque_data/NMT13_lh.pial'
+rh_surf = './macaque_data/NMT13_rh.pial'
+stat = './macaque_data/example_stat_inNMT13.nii.gz'
+lh_over = vol_to_surf(stat, lh_surf, radius=1, kind='ball')
+rh_over = vol_to_surf(stat, rh_surf, radius=1, kind='ball')
 
 # Plot unthresholded correlation map
 plot_surf4([lh_surf, rh_surf],
@@ -29,7 +23,6 @@ plot_surf4([lh_surf, rh_surf],
 # Plot thresholded correlation map
 plot_surf4([lh_surf, rh_surf],
            overlays=[lh_over, rh_over],
-           sulc_maps=[lh_sulc, rh_sulc],
            vmin=-1.2, vmax=1.2, threshold=0.3,
            cmap='RdBu_r', avg_method='mean',
            title='Correlation (Z)', colorbar=True,
