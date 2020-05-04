@@ -64,7 +64,7 @@ def yrotate(theta):
 
 def plot_surf4(meshes, overlays=None,
                sulc_maps=None, ctx_masks=None,
-               labels=None, label_colors=None,
+               labels=None, label_colors=None, label_alpha=0.5,
                cmap=None, shuffle_cmap=False,
                threshold=None, vmin=None, vmax=None,
                avg_method='mean', colorbar=False,
@@ -83,9 +83,9 @@ def plot_surf4(meshes, overlays=None,
         are .gii, or Freesurfer specific files such as
         .thickness, .curv, .sulc, .annot, .label
     sulc_maps: optional, list of two files [lh, rh]
-        Sulcal depth map to be plotted on the mesh in greyscale,
-        underneath the overlay.  Valid formats
-        are .gii, or Freesurfer specific file .sulc
+        Sulcal depth (or curvature) map to be plotted on the mesh
+        in greyscale, underneath the overlay. Valid formats
+        are .gii, or Freesurfer specific files .sulc and .curv
     ctx_masks: optional, list of two files [lh, rh]
         Cortical labels (masks) to restrict overlay data.
         Valid formats are Freesurfer specific file .label,
@@ -98,6 +98,8 @@ def plot_surf4(meshes, overlays=None,
     label_colors: list of matplotlib colors to be assigned to labels,
         of the form [ color_label1, color_label2, ... ]
         Must have the same langth as the list of labels.
+    label_alpha: float, transparency level for label colors
+        fro 0 (translucent) to 1 (fully opaque)
     cmap: matplotlib colormap, str or colormap object, default is None
         To use for plotting of the overlay. Either a string
         which is a name of a matplotlib colormap, or a matplotlib
@@ -203,6 +205,8 @@ def plot_surf4(meshes, overlays=None,
                 raise ValueError('labels and label_colors must be'
                                  ' lists of the same length.')
             label_colors = [to_rgba_array(c) for c in label_colors]
+            for c in label_colors:
+                c[0, 3] = label_alpha
             for label in labels:
                 L_mask = np.zeros(vertices.shape[0]).astype(bool)
                 L_indices = surface.load_surf_data(label[m])
@@ -261,12 +265,13 @@ def plot_surf4(meshes, overlays=None,
 
         # make non-cortical faces light grey
         if ctx_masks is not None:
-            face_colors[masked_indices] = [0.8, 0.8, 0.8, 1]
+            face_colors[masked_indices] = [0.85, 0.85, 0.85, 1]
 
         # assign label faces to appropriate color
         for i, L in enumerate(label_mask_faces):
             L_idx = np.where(L >= 0.5)
-            face_colors[L_idx] = label_colors[i]
+            # blend (multiply) label color with underlying color
+            face_colors[L_idx] = face_colors[L_idx] * label_colors[i]
 
         face_colors[:, 0] *= intensity
         face_colors[:, 1] *= intensity

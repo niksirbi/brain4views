@@ -32,11 +32,14 @@ rh_over = '/home/nsirmpilatze/BS/Meshes/human_maps/BS_Zmap_mean_rh.surf.gii'
 # cortical parcellations - Destrieux atlas (or other .annot files)
 lh_parc = label_dir + 'lh.aparc.a2009s.annot'
 rh_parc = label_dir + 'rh.aparc.a2009s.annot'
-# V1 labels (or other .label files)
+# V1 and MT labels (or other .label files)
 lh_V1 = label_dir + 'lh.V1_exvivo.thresh.label'
 rh_V1 = label_dir + 'rh.V1_exvivo.thresh.label'
 lh_MT = label_dir + 'lh.MT_exvivo.thresh.label'
 rh_MT = label_dir + 'rh.MT_exvivo.thresh.label'
+# Colors (given in HEX here)
+green = '#66c2a5'
+pink = '#e78ac3'
 
 # Plot sulcal map only
 plot_surf4([lh_surf, rh_surf],
@@ -51,7 +54,7 @@ plot_surf4([lh_surf, rh_surf],
            sulc_maps=[lh_sulc, rh_sulc],
            ctx_masks=[lh_mask, rh_mask],
            labels=[[lh_V1, rh_V1], [lh_MT, rh_MT]],
-           label_colors=['green', 'cyan'],
+           label_colors=[pink, green],
            output_file='human_sulcal_plot_withV1-MT.png')
 
 # plot cortical thickness
@@ -80,7 +83,7 @@ plot_surf4([lh_surf, rh_surf],
            sulc_maps=[lh_sulc, rh_sulc],
            ctx_masks=[lh_mask, rh_mask],
            labels=[[lh_V1, rh_V1], [lh_MT, rh_MT]],
-           label_colors=['green', 'cyan'],
+           label_colors=[pink, green],
            vmin=-1.5, threshold=0.4, vmax=1.5,
            cmap='RdBu_r', avg_method='mean',
            title='Correlation (Z)', colorbar=True,
