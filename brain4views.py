@@ -10,8 +10,8 @@ EPSILON = 1e-12  # small value to add to avoid division with zero
 
 
 def normalize_v3(arr):
-    ''' Normalize a numpy array of 3 component vectors shape=(n,3) '''
-    lens = np.sqrt(arr[:, 0]**2 + arr[:, 1]**2 + arr[:, 2]**2)
+    """Normalize a numpy array of 3 component vectors shape=(n,3)"""
+    lens = np.sqrt(arr[:, 0] ** 2 + arr[:, 1] ** 2 + arr[:, 2] ** 2)
     arr[:, 0] /= lens + EPSILON
     arr[:, 1] /= lens + EPSILON
     arr[:, 2] /= lens + EPSILON
@@ -38,37 +38,51 @@ def frustum(left, right, bottom, top, znear, zfar):
 
 
 def perspective(fovy, aspect, znear, zfar):
-    h = np.tan(0.5*np.radians(fovy)) * znear
+    h = np.tan(0.5 * np.radians(fovy)) * znear
     w = h * aspect
     return frustum(-w, w, -h, h, znear, zfar)
 
 
 def translate(x, y, z):
-    return np.array([[1, 0, 0, x], [0, 1, 0, y],
-                     [0, 0, 1, z], [0, 0, 0, 1]], dtype=float)
+    return np.array(
+        [[1, 0, 0, x], [0, 1, 0, y], [0, 0, 1, z], [0, 0, 0, 1]], dtype=float
+    )
 
 
 def xrotate(theta):
     t = np.pi * theta / 180
     c, s = np.cos(t), np.sin(t)
-    return np.array([[1, 0, 0, 0], [0, c, -s, 0],
-                     [0, s, c, 0], [0, 0, 0, 1]], dtype=float)
+    return np.array(
+        [[1, 0, 0, 0], [0, c, -s, 0], [0, s, c, 0], [0, 0, 0, 1]], dtype=float
+    )
 
 
 def yrotate(theta):
     t = np.pi * theta / 180
     c, s = np.cos(t), np.sin(t)
-    return np.array([[c, 0, s, 0], [0, 1, 0, 0],
-                     [-s, 0, c, 0], [0, 0, 0, 1]], dtype=float)
+    return np.array(
+        [[c, 0, s, 0], [0, 1, 0, 0], [-s, 0, c, 0], [0, 0, 0, 1]], dtype=float
+    )
 
 
-def plot_surf4(meshes, overlays=None,
-               sulc_maps=None, ctx_masks=None,
-               labels=None, label_colors=None, label_alpha=0.5,
-               cmap=None, shuffle_cmap=False,
-               threshold=None, vmin=None, vmax=None,
-               avg_method='mean', colorbar=False,
-               output_file='plot.png', title=''):
+def plot_surf4(
+    meshes,
+    overlays=None,
+    sulc_maps=None,
+    ctx_masks=None,
+    labels=None,
+    label_colors=None,
+    label_alpha=0.5,
+    cmap=None,
+    shuffle_cmap=False,
+    threshold=None,
+    vmin=None,
+    vmax=None,
+    avg_method="mean",
+    colorbar=False,
+    output_file="plot.png",
+    title="",
+):
     """Plottig of surface mesh with optional overlay data
     and sulcal maps.
 
@@ -125,11 +139,11 @@ def plot_surf4(meshes, overlays=None,
         is saved to a file, and the display is closed.
     """
 
-    print('plotting...')
+    print("plotting...")
 
     # if no cmap is given, set to matplotlib default
     if cmap is None:
-        cmap = plt.cm.get_cmap(plt.rcParamsDefault['image.cmap'])
+        cmap = plt.cm.get_cmap(plt.rcParamsDefault["image.cmap"])
     else:
         # if cmap is given as string, translate to matplotlib cmap
         if isinstance(cmap, str):
@@ -156,15 +170,15 @@ def plot_surf4(meshes, overlays=None,
 
         # Set up lighting, intensity and shading
         rotations = rotations_both[m]
-        vert_range = max(vertices.max(0)-vertices.min(0))
-        vertices = (vertices-(vertices.max(0)+vertices.min(0))/2) / vert_range
+        vert_range = max(vertices.max(0) - vertices.min(0))
+        vertices = (vertices - (vertices.max(0) + vertices.min(0)) / 2) / vert_range
         face_normals = normal_vectors(vertices, faces)
         light = np.array([0, 0, 1])
         intensity = np.dot(face_normals, light)
         shading = 0.7  # shading 0-1. 0=none. 1=full
         # top 20% all become fully colored
         denom = np.percentile(intensity, 80) - np.min(intensity)
-        intensity = (1-shading) + shading*(intensity-np.min(intensity)) / denom
+        intensity = (1 - shading) + shading * (intensity - np.min(intensity)) / denom
         intensity[intensity > 1] = 1
 
         # initiate array for face colors
@@ -186,8 +200,10 @@ def plot_surf4(meshes, overlays=None,
         else:
             sulc = surface.load_surf_data(sulc_maps[m])
             if sulc.shape[0] != vertices.shape[0]:
-                raise ValueError('The sulcal map does not have the same '
-                                 'number of vertices as the mesh.')
+                raise ValueError(
+                    "The sulcal map does not have the same "
+                    "number of vertices as the mesh."
+                )
 
         sulc_faces = np.mean(sulc[faces], axis=1)
         # binarize sulcal map
@@ -202,8 +218,9 @@ def plot_surf4(meshes, overlays=None,
         label_masks = []
         if labels is not None:
             if len(label_colors) != len(labels):
-                raise ValueError('labels and label_colors must be'
-                                 ' lists of the same length.')
+                raise ValueError(
+                    "labels and label_colors must be" " lists of the same length."
+                )
             label_colors = [to_rgba_array(c) for c in label_colors]
             for c in label_colors:
                 c[0, 3] = label_alpha
@@ -220,15 +237,19 @@ def plot_surf4(meshes, overlays=None,
         if overlays is not None:
             overlay = surface.load_surf_data(overlays[m])
             if len(overlay.shape) is not 1:
-                raise ValueError('overlay can only have one dimension'
-                                 ' but has %i dimensions' % len(overlay.shape))
+                raise ValueError(
+                    "overlay can only have one dimension"
+                    " but has %i dimensions" % len(overlay.shape)
+                )
             if overlay.shape[0] != vertices.shape[0]:
-                raise ValueError('The overlay does not have the same number'
-                                 ' of vertices as the mesh.')
+                raise ValueError(
+                    "The overlay does not have the same number"
+                    " of vertices as the mesh."
+                )
 
         ##################################
         # assign greyscale colormap to sulcal map faces
-        greys = plt.get_cmap('Greys', 512)
+        greys = plt.get_cmap("Greys", 512)
         greys_narrow = ListedColormap(greys(np.linspace(0.42, 0.58, 256)))
         face_colors = greys_narrow(sulc_faces)
 
@@ -242,9 +263,9 @@ def plot_surf4(meshes, overlays=None,
 
         if overlays is not None:
             # create face values from vertex values by selected avg methods
-            if avg_method == 'mean':
+            if avg_method == "mean":
                 overlay_faces = np.mean(overlay[faces], axis=1)
-            elif avg_method == 'median':
+            elif avg_method == "median":
                 overlay_faces = np.median(overlay[faces], axis=1)
 
             # if no vmin/vmax are passed figure them out from the data
@@ -280,26 +301,38 @@ def plot_surf4(meshes, overlays=None,
         ##################################
         # Draw the plot
         for i, view in enumerate(rotations):
-            MVP = perspective(25, 1, 1, 100) @ translate(0, 0, -3) @ yrotate(view) @ xrotate(270)
-        # translate coordinates based on viewing position
-            V = np.c_[vertices, np.ones(len(vertices))]  @ MVP.T
+            MVP = (
+                perspective(25, 1, 1, 100)
+                @ translate(0, 0, -3)
+                @ yrotate(view)
+                @ xrotate(270)
+            )
+            # translate coordinates based on viewing position
+            V = np.c_[vertices, np.ones(len(vertices))] @ MVP.T
             V /= V[:, 3].reshape(-1, 1)
             V = V[faces]
-        # triangle coordinates
+            # triangle coordinates
             T = V[:, :, :2]
-        # get Z values for ordering triangle plotting
+            # get Z values for ordering triangle plotting
             Z = -V[:, :, 2].mean(axis=1)
-        # sort the triangles based on their z coordinate
+            # sort the triangles based on their z coordinate
             Zorder = np.argsort(Z)
             T, C = T[Zorder, :], face_colors[Zorder, :]
-        # add subplot and plot PolyCollection
-            ax = fig.add_subplot(2, 2, m + 2*i + 1,
-                                 xlim=[-1, +1], ylim=[-0.6, +0.6],
-                                 frameon=False, aspect=1,
-                                 xticks=[], yticks=[])
-            collection = PolyCollection(T, closed=True, antialiased=False,
-                                        facecolor=C, edgecolor=C,
-                                        linewidth=0)
+            # add subplot and plot PolyCollection
+            ax = fig.add_subplot(
+                2,
+                2,
+                m + 2 * i + 1,
+                xlim=[-1, +1],
+                ylim=[-0.6, +0.6],
+                frameon=False,
+                aspect=1,
+                xticks=[],
+                yticks=[],
+            )
+            collection = PolyCollection(
+                T, closed=True, antialiased=False, facecolor=C, edgecolor=C, linewidth=0
+            )
             collection.set_alpha(1)
             ax.add_collection(collection)
 
@@ -322,34 +355,34 @@ def plot_surf4(meshes, overlays=None,
 
             cmaplist = [our_cmap(i) for i in range(our_cmap.N)]
             # set colors to grey for absolute values < threshold
-            istart = int(norm(-threshold, clip=True) *
-                             (our_cmap.N - 1))
-            istop = int(norm(threshold, clip=True) *
-                        (our_cmap.N - 1))
+            istart = int(norm(-threshold, clip=True) * (our_cmap.N - 1))
+            istop = int(norm(threshold, clip=True) * (our_cmap.N - 1))
             for i in range(istart, istop):
-                cmaplist[i] = (0.5, 0.5, 0.5, 1.)
+                cmaplist[i] = (0.5, 0.5, 0.5, 1.0)
             our_cmap = LinearSegmentedColormap.from_list(
-                'Custom cmap', cmaplist, our_cmap.N)
+                "Custom cmap", cmaplist, our_cmap.N
+            )
 
         # we need to create a proxy mappable
         proxy_mappable = ScalarMappable(cmap=our_cmap, norm=norm)
         proxy_mappable.set_array(overlay_faces)
         cax = plt.axes([0.38, 0.466, 0.24, 0.024])
-        plt.colorbar(proxy_mappable, cax=cax,
-                     boundaries=bounds,
-                     ticks=ticks,
-                     orientation='horizontal')
+        plt.colorbar(
+            proxy_mappable,
+            cax=cax,
+            boundaries=bounds,
+            ticks=ticks,
+            orientation="horizontal",
+        )
 
     # add annotations
     if title is not None:
-        fig.text(0.5, 0.51, title, ha='center', va='bottom',
-                 fontsize='large')
-    fig.text(0.25, 0.975, 'Left', ha='center', va='top')
-    fig.text(0.75, 0.975, 'Right', ha='center', va='top')
-    fig.text(0.025, 0.75, 'Lateral', ha='left', va='center', rotation=90)
-    fig.text(0.025, 0.25, 'Medial', ha='left', va='center', rotation=90)
-    fig.subplots_adjust(left=0, right=1, top=1, bottom=0,
-                        wspace=0, hspace=0)
+        fig.text(0.5, 0.51, title, ha="center", va="bottom", fontsize="large")
+    fig.text(0.25, 0.975, "Left", ha="center", va="top")
+    fig.text(0.75, 0.975, "Right", ha="center", va="top")
+    fig.text(0.025, 0.75, "Lateral", ha="left", va="center", rotation=90)
+    fig.text(0.025, 0.25, "Medial", ha="left", va="center", rotation=90)
+    fig.subplots_adjust(left=0, right=1, top=1, bottom=0, wspace=0, hspace=0)
 
     # save file
     fig.savefig(output_file, dpi=128)
